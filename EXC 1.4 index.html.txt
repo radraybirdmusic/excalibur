@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCALIBUR // HUD v1.04</title>
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-green: #003b00;
+            --warning-amber: #ffb000; /* High legibility for labels */
+            --terminal-black: #050505;
+            --heat-red: #ff4444;
+        }
+
+        body { 
+            background-color: var(--terminal-black); 
+            color: var(--neon-green); 
+            font-family: 'Courier New', Courier, monospace; 
+            margin: 0; padding: 15px; 
+        }
+
+        #hud-container { 
+            max-width: 650px; 
+            margin: 0 auto; 
+            border: 2px solid var(--neon-green); 
+            padding: 15px; 
+            position: relative;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            border-bottom: 2px solid var(--neon-green);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .round-badge {
+            border: 1px solid var(--neon-green);
+            padding: 5px 15px;
+            background: var(--dark-green);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .label { 
+            color: var(--warning-amber); 
+            font-size: 0.85em; 
+            font-weight: bold;
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        h2 { margin: 5px 0; letter-spacing: 2px; color: #fff; }
+
+        .data-section {
+            border: 1px solid var(--dark-green);
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(0, 59, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        #motive-list { padding-left: 18px; color: #fff; } /* White text for core motives */
+        #motive-list li { margin-bottom: 8px; }
+
+        .item-tag {
+            display: inline-block;
+            background: var(--neon-green);
+            color: black;
+            padding: 2px 8px;
+            margin-right: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        #quest-ledger {
+            display: none; 
+            margin-top: 20px;
+            border: 2px dashed var(--heat-red);
+            padding: 15px;
+            color: var(--heat-red);
+        }
+
+        .pulse-text { animation: flicker 2s infinite; }
+        @keyframes flicker { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div id="hud-container">
+    <div class="header-grid">
+        <div>
+            <div class="label">System Status</div>
+            <div id="system-status" class="pulse-text">CONNECTING...</div>
+        </div>
+        <div class="round-badge">RD: <span id="round-num">--</span></div>
+    </div>
+
+    <div class="data-section">
+        <div class="label">Primary Node Identity</div>
+        <h2 id="player-role">NOT_FOUND</h2>
+        <p id="player-bio" style="font-size: 0.9em; color: #ccc;"></p>
+    </div>
+
+    <div class="data-section">
+        <div class="label">Mission Objectives & Motives</div>
+        <ul id="motive-list"></ul>
+    </div>
+
+    <div class="stats-grid">
+        <div class="data-section">
+            <div class="label">Detected Alliances</div>
+            <div id="alliances-list" style="font-size: 0.85em;">Scanning...</div>
+        </div>
+        <div class="data-section">
+            <div class="label">Active Inventory</div>
+            <div id="inventory-list"></div>
+        </div>
+    </div>
+
+    <div class="data-section" style="border-color: var(--heat-red);">
+        <div class="label" style="color: var(--heat-red);">Current Heat // Danger Level</div>
+        <div id="heat-status">--</div>
+    </div>
+
+    <div id="quest-ledger">
+        <div class="label" style="color: var(--heat-red);">!! THE RESTORED CHRONICLE !!</div>
+        <div id="quest-list"></div>
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const myNodeID = params.get('node') || "01";
+    
+    async function updateHUD() {
+        try {
+            const res = await fetch(`./manifest.json?t=${new Date().getTime()}`);
+            const data = await res.json();
+            const round = data.current_live_round;
+            const nodeName = data.assignments[myNodeID][0];
+            const schedule = data.round_schedule[round][nodeName];
+
+            // 1. Identity & Round
+            document.getElementById('round-num').innerText = round;
+            document.getElementById('player-role').innerText = nodeName.replace('NODE_', '');
+            document.getElementById('player-bio').innerText = data.library[nodeName].bio;
+            document.getElementById('system-status').innerText = `${data.system_status} // SYNC_OK`;
+
+            // 2. Motives (White for contrast)
+            let mHTML = "";
+            schedule.motives.forEach(m => { mHTML += `<li>${m}</li>`; });
+            document.getElementById('motive-list').innerHTML = mHTML;
+
+            // 3. Alliances & Inventory (Using the metadata we will add later)
+            // For now, let's pull 'clues' into inventory
+            let iHTML = "";
+            if(schedule.clues) {
+                schedule.clues.forEach(c => { iHTML += `<span class="item-tag">${c}</span>`; });
+            }
+            document.getElementById('inventory-list').innerHTML = iHTML || "EMPTY";
+            
+            // Heat Status (Example check)
+            document.getElementById('heat-status').innerText = data.system_status.includes("STABLE") ? "LOW" : "ELEVATED";
+
+            // 4. Ledger Logic
+            const ledger = document.getElementById('quest-ledger');
+            if (data.ledger_visibility === "VISIBLE") {
+                ledger.style.display = "block";
+                let qHTML = "<ul>";
+                for (let n in data.round_schedule[round]) {
+                    qHTML += `<li><strong>${n.replace('NODE_', '')}:</strong> ${data.round_schedule[round][n].motives[0]}</li>`;
+                }
+                document.getElementById('quest-list').innerHTML = qHTML + "</ul>";
+            } else { ledger.style.display = "none"; }
+
+        } catch (e) { document.getElementById('system-status').innerText = "CONNECTION LOST..."; }
+    }
+    updateHUD();
+    setInterval(updateHUD, 10000);
+</script>
+</body>
+</html>
