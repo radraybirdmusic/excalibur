@@ -1,6 +1,6 @@
 // hud.js - EXCALIBUR v1.02 (API & Round Schedule Edition)
 const HUD_REFRESH_RATE = 10000; // 10-second heartbeat
-const myNodeID = "04"; // Example: This player is The Hammer. Change per device.
+const myNodeID = "01"; // Example: This player is The Hammer. Change per device.
 
 async function updateHUD() {
     try {
