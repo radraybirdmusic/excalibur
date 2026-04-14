@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>EXCALIBUR v1.03b DEBUG</title>
+    <style>body{background:#000;color:#0f0;font-family:monospace;padding:20px;}</style>
+</head>
+<body>
+    <div id="debug-info" style="color:#555;font-size:10px;">DETECTOR: <span id="id-check">..</span></div>
+    <h2 id="player-role">LOADING...</h2>
+    <div id="system-status">INIT...</div>
+    <p id="player-bio"></p>
+    <ul id="motive-list"></ul>
+
+    <script>
+        // THE URL SCANNER
+        const params = new URLSearchParams(window.location.search);
+        const myNodeID = params.get('node') || "01";
+        
+        // VISUAL CHECK
+        document.getElementById('id-check').innerText = "URL_ID_IS_" + myNodeID;
+
+        async function updateHUD() {
+            try {
+                // CACHE BUSTER
+                const t = new Date().getTime();
+                const res = await fetch(`./manifest.json?t=${t}`);
+                const data = await res.json();
+                
+                const nodeName = data.assignments[myNodeID][0];
+                const round = data.current_live_round;
+                const schedule = data.round_schedule[round][nodeName];
+
+                document.getElementById('player-role').innerText = nodeName;
+                document.getElementById('player-bio').innerText = data.library[nodeName].bio;
+                document.getElementById('system-status').innerText = data.system_status + " // NODE_" + myNodeID;
+
+                let mHTML = "";
+                schedule.motives.forEach(m => { mHTML += "<li>" + m + "</li>"; });
+                document.getElementById('motive-list').innerHTML = mHTML;
+
+            } catch (e) {
+                document.getElementById('system-status').innerText = "SYNC ERROR";
+            }
+        }
+        updateHUD();
+        setInterval(updateHUD, 10000);
+    </script>
+</body>
+</html>
