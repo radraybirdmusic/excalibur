@@ -1,6 +1,6 @@
 // EXCALIBUR HUD v1.02b - Production Pulse
 const HUD_REFRESH_RATE = 10000; // 10-second heartbeat
-const myNodeID = "01"; // Change this to test different characters (01-15)
+const myNodeID = "04"; // Change this to test different characters (01-15)
 
 async function updateHUD() {
     try {
