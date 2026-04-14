@@ -20,42 +20,57 @@
     "15": ["NODE_RESIDENT"]
   },
   "library": {
-    "NODE_MARSHALL": {
-      "bio": "The Marshall. Order in a world of static. Seeking the physical killer."
-    },
-    "NODE_SEER": {
-      "bio": "The Seer. Vessel for the 16Hz ripple. Interpreting omens of the glitch."
-    },
-    "NODE_CAPT_MARSH": {
-      "bio": "Captain Obed Marsh. Salt-worn and timeline-displaced. Holder of the old maps."
-    },
-    "NODE_HAMMER": {
-      "bio": "The Hammer. Specialist in structural integrity and mechanical restoration. Forged in the heat of a breaking reality."
-    },
-    "NODE_PROPRIETOR": {
-      "bio": "The Proprietor. Resource custodian and keeper of the central hub."
-    },
-    "NODE_RESIDENT": {
-      "bio": "The Resident. Guardian of the Restored Chronicle. The final node."
-    }
+    "NODE_MARSHALL": { "bio": "The Marshall. Order in a world of static. Seeking the physical killer." },
+    "NODE_SEER": { "bio": "The Seer. Vessel for the 16Hz ripple. Interpreting omens of the glitch." },
+    "NODE_CAPT_MARSH": { "bio": "Captain Obed Marsh. Salt-worn and timeline-displaced. Holder of the old maps." },
+    "NODE_HAMMER": { "bio": "The Hammer. Specialist in structural integrity and mechanical restoration." },
+    "NODE_FARRIER": { "bio": "The Farrier. Master of iron and the heat that reshapes reality." },
+    "NODE_ECHO": { "bio": "The Echo. A lingering voice from a timeline that shouldn't exist." },
+    "NODE_SURGEON": { "bio": "The Surgeon. Repairing the biological glitches in the population." },
+    "NODE_LIBRARIAN": { "bio": "The Librarian. Keeper of the physical books before they turned to data." },
+    "NODE_SURVEYOR": { "bio": "The Surveyor. Mapping the shifting borders of the Gulch." },
+    "NODE_GAMBLER": { "bio": "The Gambler. Betting against the house in a rigged reality." },
+    "NODE_TELEGRAPHIST": { "bio": "The Telegraphist. Intercepting the 16Hz signals from the void." },
+    "NODE_OUTLAW": { "bio": "The Outlaw. Living in the static between the law and the glitch." },
+    "NODE_DRIFTER": { "bio": "The Drifter. Wandering through multiple versions of the town." },
+    "NODE_PROPRIETOR": { "bio": "The Proprietor. Resource custodian and keeper of the central hub." },
+    "NODE_RESIDENT": { "bio": "The Resident. Guardian of the Restored Chronicle. The final node." }
   },
   "round_schedule": {
     "1": {
       "NODE_MARSHALL": {
         "motives": ["Identify the first anomaly at the Gulch."],
-        "suspicions": ["The Drifter's timeline doesn't match the ledger."],
-        "clues": ["Broken Badge", "Flickering Pocket Watch"]
+        "suspicions": ["The Drifter's timeline doesn't match."],
+        "clues": ["Broken Badge"]
       },
       "NODE_SEER": {
         "motives": ["Find the harmony in the static."],
-        "suspicions": ["The Prophet is hiding a digital resonance."],
-        "clues": ["Static-filled Crystal Ball"]
+        "suspicions": ["The Prophet is hiding resonance."],
+        "clues": ["Crystal Ball"]
+      },
+      "NODE_CAPT_MARSH": {
+        "motives": ["Locate the old shoreline."],
+        "suspicions": ["The water is moving backwards."],
+        "clues": ["Rusted Sextant"]
       },
       "NODE_HAMMER": {
-        "motives": ["Maintain the physical seals of the town.", "Analyze the structural 'jitter' in the mines."],
-        "suspicions": ["The Surveyor's tools are measuring depth that shouldn't exist."],
-        "clues": ["Resonant Tuning Fork", "Oil-stained Blueprint"]
-      }
+        "motives": ["Maintain physical seals.", "Analyze mine jitter."],
+        "suspicions": ["Tools are measuring false depths."],
+        "clues": ["Tuning Fork"]
+      },
+      "NODE_FARRIER": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Iron Scrap"] },
+      "NODE_ECHO": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Static Record"] },
+      "NODE_SURGEON": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Scalpel"] },
+      "NODE_LIBRARIAN": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Tattered Page"] },
+      "NODE_SURVEYOR": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Theodolite"] },
+      "NODE_GAMBLER": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Weighted Die"] },
+      "NODE_TELEGRAPHIST": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Morse Code Tape"] },
+      "NODE_OUTLAW": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Wanted Poster"] },
+      "NODE_DRIFTER": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Dusty Map"] },
+      "NODE_PROPRIETOR": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Ledger Key"] },
+      "NODE_RESIDENT": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Chronicle Fragment"] }
     }
   }
 }
+
+
