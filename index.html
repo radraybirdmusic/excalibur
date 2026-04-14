@@ -117,7 +117,69 @@
     <div id="notification-area" class="broadcast-msg"></div>
 </div>
 
-<script src="./hud.js"></script>
+<script>
+    async function updateHUD() {
+        console.log("Nodal Sync Initialized...");
+        try {
+            // Hard-coded data to force a display
+            const data = {
+                "system_status": "OVR // SIGNAL_ESTABLISHED",
+                "assignments": { "01": ["NODE_MARSHALL"] },
+                "library": { "NODE_MARSHALL": { "bio": "THE INLINE SCRIPT IS ACTIVE. THE EXTERNAL HUD.JS WAS THE PROBLEM." } },
+                "round_schedule": { "1": { "NODE_MARSHALL": { "motives": ["Handshake Successful."] } } }
+            };
+
+            const nodeName = data.assignments["01"][0];
+            const nodeBase = data.library[nodeName];
+            const schedule = data.round_schedule["1"][nodeName];
+
+            document.getElementById('player-role').innerText = nodeName.replace('NODE_', '');
+            document.getElementById('player-bio').innerText = nodeBase.bio;
+            document.getElementById('system-status').innerText = data.system_status;
+            
+            let motiveHTML = "";
+            schedule.motives.forEach(m => { motiveHTML += `<li>${m}</li>`; });
+            document.getElementById('motive-list').innerHTML = motiveHTML;
+
+        } catch (e) {
+            document.getElementById('system-status').innerText = "INLINE SCRIPT ERROR";
+        }
+    }
+    updateHUD();
+</script>
+
+<script>
+    async function updateHUD() {
+        console.log("Nodal Sync Initialized...");
+        try {
+            // Hard-coded data to force a display
+            const data = {
+                "system_status": "OVR // SIGNAL_ESTABLISHED",
+                "assignments": { "01": ["NODE_MARSHALL"] },
+                "library": { "NODE_MARSHALL": { "bio": "THE INLINE SCRIPT IS ACTIVE. THE EXTERNAL HUD.JS WAS THE PROBLEM." } },
+                "round_schedule": { "1": { "NODE_MARSHALL": { "motives": ["Handshake Successful."] } } }
+            };
+
+            const nodeName = data.assignments["01"][0];
+            const nodeBase = data.library[nodeName];
+            const schedule = data.round_schedule["1"][nodeName];
+
+            document.getElementById('player-role').innerText = nodeName.replace('NODE_', '');
+            document.getElementById('player-bio').innerText = nodeBase.bio;
+            document.getElementById('system-status').innerText = data.system_status;
+            
+            let motiveHTML = "";
+            schedule.motives.forEach(m => { motiveHTML += `<li>${m}</li>`; });
+            document.getElementById('motive-list').innerHTML = motiveHTML;
+
+        } catch (e) {
+            document.getElementById('system-status').innerText = "INLINE SCRIPT ERROR";
+        }
+    }
+    updateHUD();
+</script>
+
+
 
 </body>
 </html>
