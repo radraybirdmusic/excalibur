@@ -3,55 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXCALIBUR // HUD v1.16</title>
+    <title>EXCALIBUR // HUD v1.21</title>
     <style>
         :root { --neon-green: #00ff41; --dark-green: #003b00; --warning-amber: #ffb000; --terminal-black: #050505; }
-        body { background: var(--terminal-black); color: var(--neon-green); font-family: 'Courier New', monospace; padding: 15px; }
-        #hud-container { max-width: 650px; margin: 0 auto; border: 2px solid var(--neon-green); padding: 15px; }
-        .label { color: var(--warning-amber); font-size: 0.85em; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 2px; }
-        .data-section { border: 2px solid var(--dark-green); padding: 12px; margin-bottom: 15px; background: rgba(0, 59, 0, 0.1); }
+        body { background: var(--terminal-black); color: var(--neon-green); font-family: 'Courier New', monospace; padding: 15px; line-height: 1.4; }
+        #hud-container { max-width: 650px; margin: 0 auto; border: 2px solid var(--neon-green); padding: 15px; box-shadow: 0 0 15px rgba(0,255,65,0.2); }
+        
+        .label { color: var(--warning-amber); font-size: 0.85em; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .data-section { border: 1px solid var(--dark-green); padding: 12px; margin-bottom: 15px; background: rgba(0, 59, 0, 0.1); }
+        
+        h2 { margin: 5px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        
+        /* Node Grid */
         .node-selector { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px; margin: 10px 0; }
-        .node-btn { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; padding: 5px; cursor: pointer; font-size: 0.75em; font-weight: bold; }
-        .node-btn.selected { background: var(--neon-green); color: black; }
+        .node-btn { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; padding: 5px; cursor: pointer; font-size: 0.7em; text-transform: uppercase; }
+        .node-btn.selected { background: var(--neon-green); color: black; font-weight: bold; }
+        
         textarea { width: 100%; background: #111; color: #fff; border: 1px solid var(--dark-green); padding: 10px; font-family: monospace; resize: none; box-sizing: border-box; }
-        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 1.1em; letter-spacing: 3px; }
-        #inbox-list { list-style: none; padding: 0; font-size: 0.85em; color: #fff; }
+        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        
+        #inbox-list { list-style: none; padding: 0; font-size: 0.85em; color: #fff; max-height: 200px; overflow-y: auto; }
         #inbox-list li { border-bottom: 1px solid var(--dark-green); padding: 8px 0; }
-        .glitch-text { color: var(--warning-amber); font-weight: bold; }
+        .meta-notice { font-size: 0.65em; color: #666; font-style: italic; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div id="hud-container">
     <div class="data-section">
-        <div class="label">Nodal Frequency // <span id="player-role">--</span></div>
-        <div id="system-status">HANDSHAKE_ACTIVE</div>
+        <div class="label">Archive Connection // <span id="player-role">--</span></div>
+        <div id="system-status">ESTABLISHING RIPPLE...</div>
     </div>
 
     <div class="data-section" style="border-color: var(--warning-amber);">
-        <div class="label" style="color: var(--warning-amber);">DECRYPT THE PACKET // THE CLAP</div>
-        <button class="action-btn" style="background:var(--dark-green); color:var(--neon-green); border:1px solid var(--neon-green); margin-bottom:10px;" onclick="clapSignal()">
-            [ CLAP DOWN SIGNAL ]
-        </button>
-        <ul id="inbox-list"><li>Awaiting valid Clap...</li></ul>
+        <div class="label" style="color: var(--warning-amber);">Nodal Archive // Decrypted Hits</div>
+        <ul id="inbox-list"><li>Awaiting nodal handshake...</li></ul>
     </div>
 
     <div class="data-section">
-        <div class="label">CAPTURE PACKET // THE CLIP</div>
+        <div class="label">Performance Coordination // Relay Shot</div>
+        <div class="meta-notice">Use ONLY for cues. Real dialogue stays in the room.</div>
         <div class="node-selector" id="target-grid"></div>
-        <textarea id="msg-input" rows="2" placeholder="Input static message..."></textarea>
-        <button class="action-btn" onclick="clipSignal()">
-            [ CLIP OUT SIGNAL ]
-        </button>
+        <textarea id="msg-input" rows="2" placeholder="Input performance cue..."></textarea>
+        <button class="action-btn" onclick="shootToBin()">[ EXECUTE RELAY SHOT ]</button>
     </div>
 </div>
 
 <script>
+    // YOUR AUTHENTICATED BUCKET CREDENTIALS
+    const BIN_ID = "69df3b3e856a682189369836";
+    const API_KEY = "$2a$10$Py08gG/gZ3q3jcSUOXcVruxQ8/PsjObMgTZg7oEJdGkL7ZTh5rFPq";
+
     const params = new URLSearchParams(window.location.search);
     const myNodeID = params.get('node') || "01";
     let selectedNodes = [];
 
-    // Init Target Grid
+    // Initialize the Target Selector Grid
     const grid = document.getElementById('target-grid');
     for (let i = 1; i <= 15; i++) {
         let id = i.toString().padStart(2, '0');
@@ -66,60 +73,83 @@
         grid.appendChild(btn);
     }
 
-    // THE CLIP (Sending logic)
-    async function clipSignal() {
+    // THE CLAP: Reads from the JSONbin Bucket
+    async function updateHUD() {
+        try {
+            // Get Identity from local manifest
+            const resMan = await fetch(`./manifest.json?t=${new Date().getTime()}`);
+            const manData = await resMan.json();
+            document.getElementById('player-role').innerText = manData.assignments[myNodeID][0];
+
+            // Fetch the Shared Bucket from the cloud
+            const resBin = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: { "X-Master-Key": API_KEY }
+            });
+            const binData = await resBin.json();
+            const messages = binData.record.messages || [];
+
+            // Filter messages for this Node
+            const inbox = document.getElementById('inbox-list');
+            let found = "";
+            [...messages].reverse().forEach(pkg => {
+                if (pkg.to.split(',').includes(myNodeID)) {
+                    found += `<li><span style="color:var(--warning-amber)">[FROM_NODE_${pkg.from}]</span> ${pkg.msg}</li>`;
+                }
+            });
+            inbox.innerHTML = found || "<li>No decrypted hits detected in the ripple.</li>";
+            document.getElementById('system-status').innerText = "RIPPLE_SYNCHRONIZED";
+
+        } catch (e) { document.getElementById('system-status').innerText = "CONNECTION_LOST"; }
+    }
+
+    // THE SHOT: Writes to the JSONbin Bucket
+    async function shootToBin() {
         const msg = document.getElementById('msg-input').value;
         if (selectedNodes.length === 0 || !msg) return;
 
-        // Data Structure for the Clip
-        const packet = `[[CLIP_RELAY_ID:${myNodeID}|DEST:${selectedNodes.join(',')}|STATIC:${msg}]]`;
-        
+        document.getElementById('system-status').innerText = "UPLOADING_DATA...";
+
         try {
-            await navigator.clipboard.writeText(packet);
-            alert("SIGNAL CLIPPED TO VOID. DROP IT IN THE RELAY.");
+            // 1. Download current state
+            const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: { "X-Master-Key": API_KEY }
+            });
+            const currentData = await resGet.json();
+            let msgList = currentData.record.messages || [];
+
+            // 2. Append the new message
+            msgList.push({
+                from: myNodeID,
+                to: selectedNodes.join(','),
+                msg: msg,
+                time: new Date().toLocaleTimeString()
+            });
+
+            // Keep the bin lean (last 50 messages only)
+            if (msgList.length > 50) msgList = msgList.slice(-50);
+
+            // 3. Upload back to the cloud
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": API_KEY
+                },
+                body: JSON.stringify({ messages: msgList })
+            });
+
+            // Reset UI
             document.getElementById('msg-input').value = "";
             selectedNodes = [];
             document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('selected'));
-        } catch (err) {
-            alert("CLIP FAILED. MANUAL SNIP REQUIRED.");
-        }
+            updateHUD();
+
+        } catch (e) { alert("RELAY_FAILURE: VOID REJECTED PACKET"); }
     }
 
-    // THE CLAP (Receiving logic)
-    async function clapSignal() {
-        try {
-            const text = await navigator.clipboard.readText();
-            if (!text.includes("[[CLIP_RELAY_ID:")) {
-                alert("NO CLIPPED SIGNAL DETECTED.");
-                return;
-            }
-
-            const source = text.split("ID:")[1].split("|")[0];
-            const targets = text.split("DEST:")[1].split("|")[0];
-            const msg = text.split("STATIC:")[1].split("]]")[0];
-
-            if (targets.includes(myNodeID)) {
-                const li = document.createElement('li');
-                li.innerHTML = `<span class="glitch-text">[RECOVERED_FROM_NODE_${source}]</span><br>${msg}`;
-                const list = document.getElementById('inbox-list');
-                if (list.innerText.includes("Awaiting")) list.innerHTML = "";
-                list.prepend(li);
-            } else {
-                alert("SIGNAL CLAPPED BUT NOT FOR THIS NODE. NOISE DISCARDED.");
-            }
-        } catch (err) {
-            alert("TERMINAL REFUSED HANDSHAKE (ALLOW CLIPBOARD).");
-        }
-    }
-
-    async function init() {
-        try {
-            const res = await fetch(`./manifest.json?t=${new Date().getTime()}`);
-            const data = await res.json();
-            document.getElementById('player-role').innerText = data.assignments[myNodeID][0];
-        } catch(e) { document.getElementById('player-role').innerText = "NODE_ERR"; }
-    }
-    init();
+    // Automated pulse every 10 seconds
+    setInterval(updateHUD, 10000);
+    updateHUD();
 </script>
 </body>
 </html>
