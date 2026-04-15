@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background-color: #050505; }
-        canvas { display: block; margin: 0 auto; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
@@ -13,124 +13,58 @@
 let nodes = [];
 let currentNodeID = 1; 
 let totalNodes = 15;
-let currentScreen = "MAIN_HUD"; 
 
 function preload() {
+  // Load images 01-15 from the root
   for (let i = 1; i <= totalNodes; i++) {
-    let nodeNum = nf(i, 2);
+    let nodeNum = nf(i, 2); 
     nodes[i] = loadImage('node_' + nodeNum + '.png');
   }
 }
 
 function setup() {
-  // Use a slightly smaller canvas calculation to ensure it fits mobile browser chrome
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
 }
 
 function draw() {
-  background(2, 5, 10);
+  background(5, 10, 15);
   
-  // UI Outer Glow Frame
-  stroke(0, 255, 255, 80);
-  strokeWeight(1);
+  // Outer Border
+  stroke(0, 255, 255, 100);
+  strokeWeight(2);
   noFill();
-  rect(5, 5, width-10, height-10);
-
-  if (currentScreen === "MAIN_HUD") {
-    drawMainHUD();
-  } else if (currentScreen === "BIO_DETAIL") {
-    drawSubScreen("CHARACTER BIO", "STABILIZING RIPPLE DATA...");
-  } else if (currentScreen === "RECIPE_VAULT") {
-    drawSubScreen("CRi1 RECIPE VAULT", "LOADING DIRT-BOX RESONATOR LOGS...");
-  }
-}
-
-function drawMainHUD() {
-  // 1. HEADER
+  rect(10, 10, width-20, height-20);
+  
+  // Header
   fill(0, 255, 255);
   noStroke();
+  textSize(24);
   textAlign(LEFT);
-  textSize(20);
-  text("NODE: " + nf(currentNodeID, 2), 25, 45);
-  
-  // 2. CHARACTER IMAGE (Consolidated to Center)
+  text("NODE: " + nf(currentNodeID, 2), 30, 60);
+
+  // --- THE IMAGE (The only new thing) ---
   if (nodes[currentNodeID]) {
     imageMode(CENTER);
-    // Keep the sprite contained to 60% of width
-    let displaySize = width * 0.6;
-    image(nodes[currentNodeID], width/2, height * 0.35, displaySize, displaySize);
+    // Keep it sized to fit the iPhone width comfortably
+    let imgSize = width * 0.7;
+    image(nodes[currentNodeID], width/2, height * 0.4, imgSize, imgSize);
   }
 
-  // 3. INTERACTIVE BUTTON ROW
-  let btnW = width * 0.4; // Buttons take 40% width each
-  let btnH = 50;
-  let btnY = height * 0.7;
-  let gutter = width * 0.05; // 5% spacing
-  
-  textAlign(CENTER, CENTER);
-  textSize(14);
-
-  // CRi1 Vault Button (Left)
-  fill(0, 255, 255, 30);
-  stroke(0, 255, 255, 150);
-  rect(width/2 - btnW - gutter/2, btnY, btnW, btnH, 3);
-  fill(0, 255, 255);
-  noStroke();
-  text("CRi1 VAULT", width/2 - btnW/2 - gutter/2, btnY + btnH/2);
-
-  // View Bio Button (Right)
-  fill(0, 255, 255, 30);
-  stroke(0, 255, 255, 150);
-  rect(width/2 + gutter/2, btnY, btnW, btnH, 3);
-  fill(0, 255, 255);
-  noStroke();
-  text("VIEW BIO", width/2 + btnW/2 + gutter/2, btnY + btnH/2);
-
-  // 4. NAVIGATION FOOTER
-  textSize(11);
-  fill(0, 255, 255, 120);
+  // Footer / Instructions
   textAlign(CENTER);
-  text("< TAP EDGES TO CYCLE NODES >", width/2, height - 30);
-}
-
-function drawSubScreen(title, sub) {
-  textAlign(CENTER, CENTER);
-  fill(0, 255, 255);
-  textSize(22);
-  text(title, width/2, height/2 - 20);
-  textSize(12);
-  text(sub, width/2, height/2 + 20);
+  textSize(14);
   fill(0, 255, 255, 150);
-  text("TAP ANYWHERE TO RETURN", width/2, height - 60);
+  text("TAP SCREEN TO CYCLE NODES", width/2, height - 40);
 }
 
 function touchStarted() {
-  if (currentScreen === "MAIN_HUD") {
-    let btnW = width * 0.4;
-    let btnH = 50;
-    let btnY = height * 0.7;
-    let gutter = width * 0.05;
-
-    // Detect Vault Tap
-    if (mouseX > width/2 - btnW - gutter/2 && mouseX < width/2 - gutter/2 && mouseY > btnY && mouseY < btnY + btnH) {
-      currentScreen = "RECIPE_VAULT";
-    }
-    // Detect Bio Tap
-    else if (mouseX > width/2 + gutter/2 && mouseX < width/2 + btnW + gutter/2 && mouseY > btnY && mouseY < btnY + btnH) {
-      currentScreen = "BIO_DETAIL";
-    }
-    // Detect Cycle Tap (Left/Right 25% of screen)
-    else if (mouseX < width * 0.25) {
-      currentNodeID = (currentNodeID === 1) ? totalNodes : currentNodeID - 1;
-    } 
-    else if (mouseX > width * 0.75) {
-      currentNodeID = (currentNodeID === totalNodes) ? 1 : currentNodeID + 1;
-    }
-  } else {
-    currentScreen = "MAIN_HUD";
+  // Original simple cycling logic
+  currentNodeID++;
+  if (currentNodeID > totalNodes) {
+    currentNodeID = 1;
   }
-  return false;
+  return false; 
 }
 
 function windowResized() {
