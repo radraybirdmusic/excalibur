@@ -3,79 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXCALIBUR // HUD v1.07b</title>
+    <title>EXCALIBUR // HUD v1.09</title>
     <style>
-        :root {
-            --neon-green: #00ff41;
-            --dark-green: #003b00;
-            --warning-amber: #ffb000;
-            --terminal-black: #050505;
-            --heat-red: #ff4444;
-        }
-
-        body { 
-            background-color: var(--terminal-black); 
-            color: var(--neon-green); 
-            font-family: 'Courier New', Courier, monospace; 
-            margin: 0; padding: 15px; 
-            line-height: 1.4;
-        }
-
-        #hud-container { 
-            max-width: 650px; 
-            margin: 0 auto; 
-            border: 2px solid var(--neon-green); 
-            padding: 15px; 
-        }
-
-        .header-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            border-bottom: 2px solid var(--neon-green);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .round-badge {
-            border: 1px solid var(--neon-green);
-            padding: 5px 15px;
-            background: var(--dark-green);
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .label { 
-            color: var(--warning-amber); 
-            font-size: 0.85em; 
-            font-weight: bold;
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-
-        h2 { margin: 5px 0; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
-
-        .data-section {
-            border: 1px solid var(--dark-green);
-            padding: 12px;
-            margin-bottom: 15px;
-            background: rgba(0, 59, 0, 0.1);
-        }
-
-        /* Messaging UI */
-        .node-selector { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px; margin: 10px 0; }
-        .node-btn { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; padding: 5px; cursor: pointer; font-size: 0.7em; }
-        .node-btn.selected { background: var(--neon-green); color: black; font-weight: bold; }
-        
-        textarea { width: 100%; background: #111; color: #fff; border: 1px solid var(--dark-green); padding: 10px; font-family: monospace; resize: none; box-sizing: border-box; }
-        
-        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; text-transform: uppercase; }
-        .action-btn:hover { background: #fff; }
-
-        #inbox-list { list-style: none; padding: 0; font-size: 0.85em; color: #fff; }
-        #inbox-list li { border-bottom: 1px solid var(--dark-green); padding: 8px 0; }
-
-        #quest-ledger { display: none; margin-top: 20px; border: 2px dashed var(--heat-red); padding: 15px; color: var(--heat-red); }
+        :root { --neon-green: #00ff41; --dark-green: #003b00; --warning-amber: #ffb000; --terminal-black: #050505; --heat-red: #ff4444; }
+        body { background: var(--terminal-black); color: var(--neon-green); font-family: 'Courier New', monospace; padding: 15px; }
+        #hud-container { max-width: 650px; margin: 0 auto; border: 2px solid var(--neon-green); padding: 15px; box-shadow: 0 0 15px rgba(0,255,65,0.2); }
+        .header-grid { display: grid; grid-template-columns: 1fr auto; border-bottom: 2px solid var(--neon-green); padding-bottom: 10px; margin-bottom: 20px; }
+        .round-badge { border: 1px solid var(--neon-green); padding: 5px 15px; background: var(--dark-green); font-weight: bold; font-size: 1.2em; }
+        .label { color: var(--warning-amber); font-size: 0.85em; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .data-section { border: 1px solid var(--dark-green); padding: 12px; margin-bottom: 15px; background: rgba(0, 59, 0, 0.1); }
+        h2 { margin: 5px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        #motive-list { color: #fff; padding-left: 20px; }
+        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        #inbox-display { color: #fff; font-style: italic; border-left: 3px solid var(--warning-amber); padding-left: 10px; min-height: 30px; }
     </style>
 </head>
 <body>
@@ -83,41 +23,36 @@
 <div id="hud-container">
     <div class="header-grid">
         <div>
-            <div class="label">System Status</div>
-            <div id="system-status">INITIALIZING...</div>
+            <div class="label">Archive Connection</div>
+            <div id="system-status">SYNCING...</div>
         </div>
         <div class="round-badge">RD: <span id="round-num">--</span></div>
     </div>
 
     <div class="data-section">
-        <div class="label">Node ID Assigned</div>
+        <div class="label">Node Identity</div>
         <h2 id="player-role">--</h2>
-        <p id="player-bio" style="font-size: 0.85em; color: #ccc;"></p>
+        <div id="player-bio" style="font-size: 0.8em; color: #999;"></div>
     </div>
 
     <div class="data-section" style="border-color: var(--warning-amber);">
-        <div class="label" style="color: var(--warning-amber);">Nodal Sync // Received Packets</div>
+        <div class="label" style="color: var(--warning-amber);">Incoming Relay (Round Specific)</div>
+        <div id="inbox-display">Scanning for data packets...</div>
+    </div>
+
+    <div class="data-section">
+        <div class="label">Active Motives</div>
+        <ul id="motive-list"></ul>
+    </div>
+
+    <div class="data-section">
+        <div class="label">Nodal Gear Relay (Local Sync)</div>
         <input type="file" id="file-selector" multiple style="display:none;" onchange="syncFiles(event)">
-        <button class="action-btn" style="background: var(--dark-green); color: var(--neon-green); border: 1px solid var(--neon-green);" onclick="document.getElementById('file-selector').click()">
-            SYNC INCOMING PACKETS
-        </button>
-        <ul id="inbox-list"><li>Waiting for sync...</li></ul>
+        <button class="action-btn" onclick="document.getElementById('file-selector').click()">Sync Hand-Off Packets</button>
+        <div id="local-sync-results" style="font-size: 0.8em; margin-top: 10px; color: #fff;"></div>
     </div>
 
-    <div class="data-section">
-        <div class="label">Transmitter // Draft Transmission</div>
-        <div class="node-selector" id="target-grid"></div>
-        <textarea id="msg-input" rows="3" placeholder="Enter encrypted text..."></textarea>
-        <button class="action-btn" onclick="sendMessage()">Execute Transmission</button>
-        <div id="sent-confirmation" style="display:none; text-align:center; font-weight:bold; margin-top:10px;">PACKET GENERATED</div>
-    </div>
-
-    <div class="data-section">
-        <div class="label">Current Round Objectives</div>
-        <ul id="motive-list" style="color:#fff; font-size: 0.9em;"></ul>
-    </div>
-
-    <div id="quest-ledger">
+    <div id="quest-ledger" style="display:none; border: 2px dashed var(--heat-red); padding: 10px; color: var(--heat-red);">
         <div class="label" style="color: var(--heat-red);">!! THE RESTORED CHRONICLE !!</div>
         <div id="quest-list"></div>
     </div>
@@ -126,25 +61,7 @@
 <script>
     const params = new URLSearchParams(window.location.search);
     const myNodeID = params.get('node') || "01";
-    let selectedNodes = [];
 
-    // 1. Build Target Grid
-    const grid = document.getElementById('target-grid');
-    for (let i = 1; i <= 15; i++) {
-        let id = i.toString().padStart(2, '0');
-        if (id === myNodeID) continue;
-        let btn = document.createElement('button');
-        btn.className = 'node-btn';
-        btn.innerText = "NODE_" + id;
-        btn.onclick = () => {
-            btn.classList.toggle('selected');
-            if (selectedNodes.includes(id)) selectedNodes = selectedNodes.filter(n => n !== id);
-            else selectedNodes.push(id);
-        };
-        grid.appendChild(btn);
-    }
-
-    // 2. The Heartbeat (Update from Manifest)
     async function updateHUD() {
         try {
             const res = await fetch(`./manifest.json?t=${new Date().getTime()}`);
@@ -153,15 +70,21 @@
             const nodeName = data.assignments[myNodeID][0];
             const schedule = data.round_schedule[round][nodeName];
 
+            // 1. Core Info
             document.getElementById('round-num').innerText = round;
             document.getElementById('player-role').innerText = nodeName.replace('NODE_', '');
             document.getElementById('player-bio').innerText = data.library[nodeName].bio;
-            document.getElementById('system-status').innerText = `${data.system_status} // ID_${myNodeID}`;
+            document.getElementById('system-status').innerText = `${data.system_status} // NODE_${myNodeID}`;
 
+            // 2. Automated Round Mail
+            document.getElementById('inbox-display').innerText = schedule.incoming_mail || "No automated relays for this sector.";
+
+            // 3. Motives
             let mHTML = "";
             schedule.motives.forEach(m => { mHTML += `<li>${m}</li>`; });
             document.getElementById('motive-list').innerHTML = mHTML;
 
+            // 4. Ledger
             const ledger = document.getElementById('quest-ledger');
             if (data.ledger_visibility === "VISIBLE") {
                 ledger.style.display = "block";
@@ -171,40 +94,18 @@
                 }
                 document.getElementById('quest-list').innerHTML = qHTML + "</ul>";
             } else { ledger.style.display = "none"; }
-        } catch (e) { document.getElementById('system-status').innerText = "CONNECTION LOST..."; }
+
+        } catch (e) { document.getElementById('system-status').innerText = "ARCHIVE_SYNC_OFFLINE"; }
     }
 
-    // 3. Outgoing: Create Data Packet
-    function sendMessage() {
-        const msg = document.getElementById('msg-input').value;
-        if (selectedNodes.length === 0 || !msg) { alert("Select targets and enter message."); return; }
-
-        const packet = `SOURCE: NODE_${myNodeID}\nTARGETS: NODE_${selectedNodes.join(', NODE_')}\nTIME: ${new Date().toLocaleTimeString()}\n\nMESSAGE: ${msg}`;
-        const blob = new Blob([packet], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = `PACKET_FROM_${myNodeID}.txt`;
-        link.click();
-
-        document.getElementById('sent-confirmation').style.display = "block";
-        document.getElementById('msg-input').value = "";
-        setTimeout(() => { document.getElementById('sent-confirmation').style.display = "none"; }, 4000);
-    }
-
-    // 4. Incoming: Sync Data Packets
     function syncFiles(event) {
         const files = event.target.files;
-        const inbox = document.getElementById('inbox-list');
-        
+        const results = document.getElementById('local-sync-results');
         Array.from(files).forEach(file => {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const content = e.target.result;
-                if (content.includes(`NODE_${myNodeID}`)) {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span style="color:var(--warning-amber)">[DECRYPTED]</span><br>${content.replace(/\n/g, '<br>')}`;
-                    if (inbox.innerText.includes("Waiting")) inbox.innerHTML = "";
-                    inbox.prepend(li);
+                if (e.target.result.includes(`NODE_${myNodeID}`)) {
+                    results.innerHTML += `<div style="border-bottom:1px solid #333; padding:5px;">[SYNC_OK] ${file.name} Decrypted.</div>`;
                 }
             };
             reader.readAsText(file);
