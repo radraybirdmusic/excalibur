@@ -70,6 +70,14 @@
       "NODE_PROPRIETOR": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Ledger Key"] },
       "NODE_RESIDENT": { "motives": ["Awaiting Round 1 assignments..."], "suspicions": ["None"], "clues": ["Chronicle Fragment"] }
     }
+  "communications": {
+  "global_broadcast": "ALL UNITS: Secure the perimeter of the Gulch.",
+  "private_mail": {
+    "01": "FROM THE SEER: The static is speaking your name, Marshall.",
+    "04": "FROM THE SMITH: The silver hammer has been moved to the forge."
+  }
+}
+
   }
 }
 
