@@ -2,62 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXCALIBUR // HUD v1.25</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EXCALIBUR // HUD v1.28</title>
     <style>
-        :root { --neon-green: #00ff41; --dark-green: #003b00; --warning-amber: #ffb000; --terminal-black: #050505; --admin-blue: #0088ff; }
-        body { background: var(--terminal-black); color: var(--neon-green); font-family: 'Courier New', monospace; padding: 15px; line-height: 1.4; }
-        #hud-container { max-width: 650px; margin: 0 auto; border: 2px solid var(--neon-green); padding: 15px; }
+        :root { --neon-green: #00ff41; --dark-green: #003b00; --warning-amber: #ffb000; --terminal-black: #050505; }
+        * { box-sizing: border-box; }
+        body { background: var(--terminal-black); color: var(--neon-green); font-family: 'Courier New', monospace; margin: 0; padding: 10px; overflow-x: hidden; }
         
-        .label { color: var(--warning-amber); font-size: 0.85em; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        .data-section { border: 1px solid var(--dark-green); padding: 12px; margin-bottom: 15px; background: rgba(0, 59, 0, 0.1); }
-        
-        /* Admin Console */
-        #admin-console { display: none; border: 2px solid var(--admin-blue); background: rgba(0, 20, 40, 0.9); padding: 10px; margin-bottom: 15px; }
-        .admin-label { color: var(--admin-blue); font-size: 0.7em; font-weight: bold; }
-        
-        /* The Cherry-Pick Grid */
-        .node-selector { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px; margin: 10px 0; }
-        .node-btn { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; padding: 5px; cursor: pointer; font-size: 0.7em; transition: 0.2s; }
-        .node-btn.selected { background: var(--neon-green); color: black; font-weight: bold; box-shadow: 0 0 10px var(--neon-green); }
-        
-        textarea, select { width: 100%; background: #111; color: #fff; border: 1px solid var(--dark-green); padding: 10px; font-family: monospace; box-sizing: border-box; }
-        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        
-        #inbox-list { list-style: none; padding: 0; font-size: 0.85em; color: #fff; max-height: 300px; overflow-y: auto; }
-        #inbox-list li { border-bottom: 1px solid var(--dark-green); padding: 8px 0; }
-        .monitor-trace { border-left: 2px solid var(--admin-blue); padding-left: 10px !important; color: #aaa; font-style: italic; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--dark-green); padding-bottom: 5px; margin-bottom: 10px; }
+        .node-id { font-size: 0.8em; color: #fff; }
+        .round-badge { border: 1px solid var(--neon-green); padding: 2px 10px; background: var(--dark-green); font-weight: bold; }
+
+        /* IMAGE PORT: Placeholder for your future assets */
+        .portrait-frame { width: 100%; height: 120px; border: 1px solid var(--dark-green); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; background: #000; overflow: hidden; }
+        #char-portrait { max-width: 100%; max-height: 100%; opacity: 0.7; }
+
+        /* OBJECTIVES PANEL */
+        .objective-panel { border: 1px solid var(--warning-amber); padding: 10px; margin-bottom: 10px; background: rgba(255, 176, 0, 0.05); }
+        .label { color: var(--warning-amber); font-size: 0.7em; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; display: block; }
+        #objective-list { list-style: square; padding-left: 18px; margin: 5px 0; font-size: 0.85em; color: #fff; }
+
+        /* MESSAGING AREA */
+        .message-area { border: 1px solid var(--dark-green); padding: 8px; height: 140px; overflow-y: auto; margin-bottom: 8px; font-size: 0.8em; }
+        #inbox-list { list-style: none; padding: 0; margin: 0; }
+        #inbox-list li { border-bottom: 1px solid #111; padding: 5px 0; }
+
+        /* GRID & CONTROLS */
+        .node-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-bottom: 5px; }
+        .node-btn { aspect-ratio: 1/1; border: 1px solid var(--neon-green); background: transparent; color: var(--neon-green); font-size: 0.6em; }
+        .node-btn.selected { background: var(--neon-green); color: black; font-weight: bold; }
+        textarea { width: 100%; background: #111; color: #fff; border: 1px solid var(--dark-green); padding: 8px; font-size: 16px; margin-bottom: 5px; font-family: monospace; }
+        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; text-transform: uppercase; }
+
+        /* THE LOG (Pop-up) */
+        .log-trigger { background: #222; color: var(--warning-amber); border: 1px solid var(--warning-amber); padding: 6px; font-size: 0.8em; width: 100%; margin-top: 10px; cursor: pointer; }
+        #log-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 20px; border: 2px solid var(--neon-green); overflow-y: auto; }
+        .close-btn { color: #f44; border: 1px solid #f44; padding: 10px; text-align: center; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="hud-container">
-    <div id="admin-console">
-        <div class="admin-label">MASTER OVERRIDE // ROUND CONTROL</div>
-        <select id="round-select" onchange="updateGlobalRound()" style="margin-top:5px;">
-            <option value="1">ROUND 1</option><option value="2">ROUND 2</option>
-            <option value="3">ROUND 3</option><option value="4">ROUND 4</option>
-            <option value="5">ROUND 5</option>
-        </select>
-        <button onclick="purgeLogs()" style="background:#400; color:#f44; border:1px solid #f44; width:100%; margin-top:10px; font-size:0.7em; padding:5px;">[ PURGE BIN HISTORY ]</button>
-    </div>
+<header>
+    <div class="node-id">SYSTEM: <span id="node-label">--</span></div>
+    <div class="round-badge">RD: <span id="rd-num">--</span></div>
+</header>
 
-    <div class="data-section">
-        <div class="label">Nodal Frequency // <span id="player-role">--</span></div>
-        <div id="system-status">SYNCING RIPPLE...</div>
-    </div>
+<div class="portrait-frame">
+    <img id="char-portrait" src="" alt="[ IDENTITY_PORT_PENDING ]">
+</div>
 
-    <div class="data-section" style="border-color: var(--warning-amber);">
-        <div class="label" style="color: var(--warning-amber);">Archive Ledger</div>
-        <ul id="inbox-list"><li>Connecting...</li></ul>
-    </div>
+<div class="objective-panel">
+    <span class="label">Primary Objectives</span>
+    <ul id="objective-list"><li>Pulsing for mission data...</li></ul>
+</div>
 
-    <div class="data-section">
-        <div class="label">Multi-Relay // Cherry-Pick Targets</div>
-        <div class="node-selector" id="target-grid"></div>
-        <textarea id="msg-input" rows="2" placeholder="Input performance cue..."></textarea>
-        <button class="action-btn" id="send-btn" onclick="shootToBin()">[ EXECUTE MULTI-SHOT ]</button>
+<span class="label">The Ripple // Decrypted Relays</span>
+<div class="message-area">
+    <ul id="inbox-list"></ul>
+</div>
+
+<div class="node-grid" id="grid"></div>
+<textarea id="msg-input" rows="2" placeholder="Input performance cue..."></textarea>
+<button class="action-btn" onclick="shoot()">[ EXECUTE SHOT ]</button>
+
+<button class="log-trigger" onclick="toggleLog()">[ OPEN CHARACTER LOG ]</button>
+
+<div id="log-overlay">
+    <h2>CHARACTER ARCHIVE</h2>
+    <hr style="border:1px solid var(--dark-green)">
+    <div style="margin-top:20px;">
+        <span class="label">Identity Profile</span>
+        <p id="bio-display" style="color:#fff; font-size:0.9em;"></p>
     </div>
+    <div style="margin-top:20px;">
+        <span class="label">NPC Intelligence Cache</span>
+        <p id="mail-display" style="color:var(--warning-amber); font-style:italic; font-size:0.9em;"></p>
+    </div>
+    <div class="close-btn" onclick="toggleLog()">[ RETURN TO HUD ]</div>
 </div>
 
 <script>
@@ -65,119 +86,86 @@
     const API_KEY = "$2a$10$Py08gG/gZ3q3jcSUOXcVruxQ8/PsjObMgTZg7oEJdGkL7ZTh5rFPq";
     const params = new URLSearchParams(window.location.search);
     const myNodeID = params.get('node') || "01";
-    const isAdmin = (myNodeID === "03");
     let selectedNodes = [];
 
-    if (isAdmin) document.getElementById('admin-console').style.display = 'block';
-
-    // Build the grid - Multi-select enabled for EVERYONE
-    const grid = document.getElementById('target-grid');
+    // Grid Init
+    const g = document.getElementById('grid');
     for (let i = 1; i <= 15; i++) {
         let id = i.toString().padStart(2, '0');
         if (id === myNodeID) continue;
-        let btn = document.createElement('button');
-        btn.className = 'node-btn';
-        btn.id = `node-${id}`;
-        btn.innerText = "NODE_" + id;
-        btn.onclick = () => {
+        let b = document.createElement('button');
+        b.className = 'node-btn'; b.id = `btn-${id}`; b.innerText = id;
+        b.onclick = () => {
             if (selectedNodes.includes(id)) {
                 selectedNodes = selectedNodes.filter(n => n !== id);
-                btn.classList.remove('selected');
+                b.classList.remove('selected');
             } else {
                 selectedNodes.push(id);
-                btn.classList.add('selected');
+                b.classList.add('selected');
             }
         };
-        grid.appendChild(btn);
+        g.appendChild(b);
     }
 
-    async function updateHUD() {
-        try {
-            const resBin = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${Date.now()}`, {
-                headers: { "X-Master-Key": API_KEY }
-            });
-            const data = await resBin.json();
-            const messages = data.record.messages || [];
-            const currentRound = data.record.config?.round || 1;
+    function toggleLog() {
+        const log = document.getElementById('log-overlay');
+        log.style.display = log.style.display === 'block' ? 'none' : 'block';
+    }
 
-            if (isAdmin) document.getElementById('round-select').value = currentRound;
+    async function sync() {
+        try {
+            const resBin = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${Date.now()}`, { headers: { "X-Master-Key": API_KEY } });
+            const binData = await resBin.json();
+            const rd = binData.record.config?.round || 1;
+            document.getElementById('rd-num').innerText = rd;
 
             const resMan = await fetch(`./manifest.json?t=${Date.now()}`);
             const manData = await resMan.json();
-            document.getElementById('player-role').innerText = manData.assignments[myNodeID][0];
+            const myInfo = manData.assignments[myNodeID][0];
+            const roundData = manData.round_schedule[rd][myInfo]["scenario_A"];
 
-            const inbox = document.getElementById('inbox-list');
-            let html = "";
-            [...messages].reverse().forEach(pkg => {
-                const targets = pkg.to.split(',');
-                if (targets.includes(myNodeID)) {
-                    html += `<li><span style="color:var(--warning-amber)">[FROM_${pkg.from}]</span> ${pkg.msg}</li>`;
-                } else if (pkg.from === myNodeID) {
-                    html += `<li><span style="color:#0088ff">[SENT_TO_${pkg.to}]</span> ${pkg.msg}</li>`;
-                } else if (isAdmin) {
-                    html += `<li class="monitor-trace"><span style="color:var(--admin-blue)">[TRACE: ${pkg.from}->${pkg.to}]</span> ${pkg.msg}</li>`;
-                }
+            // Identity & Future Image Mapping
+            document.getElementById('node-label').innerText = myInfo.replace('NODE_', '');
+            document.getElementById('bio-display').innerText = manData.library[myInfo].bio;
+            document.getElementById('mail-display').innerText = roundData.mail;
+            
+            // Looking for image matching node ID: e.g. "node_01.png"
+            document.getElementById('char-portrait').src = `assets/node_${myNodeID}.png`;
+
+            let objHtml = "";
+            roundData.motives.forEach(m => objHtml += `<li>${m}</li>`);
+            document.getElementById('objective-list').innerHTML = objHtml;
+
+            let inHtml = "";
+            [...binData.record.messages].reverse().forEach(p => {
+                if (p.to.split(',').includes(myNodeID)) inHtml += `<li><span style="color:var(--warning-amber)">[F_${p.from}]</span> ${p.msg}</li>`;
+                else if (p.from === myNodeID) inHtml += `<li style="color:#666">[S_${p.to}] ${p.msg}</li>`;
             });
-            inbox.innerHTML = html || "<li>No packets found.</li>";
-            document.getElementById('system-status').innerText = `STABLE // ROUND ${currentRound}`;
-        } catch (e) { document.getElementById('system-status').innerText = "RIPPLE_SYNC_ERR"; }
+            document.getElementById('inbox-list').innerHTML = inHtml || "<li>Signal Dead.</li>";
+        } catch(e) {}
     }
 
-    async function shootToBin() {
+    async function shoot() {
         const msg = document.getElementById('msg-input').value;
-        if (selectedNodes.length === 0 || !msg) return;
-
+        if (!selectedNodes.length || !msg) return;
         try {
             const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } });
-            const data = await resGet.json();
-            let msgList = data.record.messages || [];
-            
-            msgList.push({ from: myNodeID, to: selectedNodes.join(','), msg: msg });
-            if (msgList.length > 50) msgList = msgList.slice(-50);
-
+            const d = await resGet.json();
+            let ml = d.record.messages || [];
+            ml.push({ from: myNodeID, to: selectedNodes.join(','), msg: msg });
             await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT',
-                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-                body: JSON.stringify({ ...data.record, messages: msgList })
+                method: 'PUT', headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+                body: JSON.stringify({ ...d.record, messages: ml.slice(-40) })
             });
-
             document.getElementById('msg-input').value = "";
             selectedNodes = [];
             document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('selected'));
-            updateHUD();
-        } catch (e) { alert("SHOT_FAILED"); }
+            sync();
+        } catch(e) { alert("SHOT_FAILED"); }
     }
 
-    async function updateGlobalRound() {
-        const newRound = document.getElementById('round-select').value;
-        try {
-            const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } });
-            const data = await resGet.json();
-            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT',
-                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-                body: JSON.stringify({ ...data.record, config: { round: newRound } })
-            });
-            updateHUD();
-        } catch (e) { alert("ERROR"); }
-    }
-
-    async function purgeLogs() {
-        if (!confirm("Wipe archive?")) return;
-        try {
-            const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } });
-            const data = await resGet.json();
-            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT',
-                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-                body: JSON.stringify({ ...data.record, messages: [] })
-            });
-            updateHUD();
-        } catch (e) { alert("ERROR"); }
-    }
-
-    updateHUD();
-    setInterval(updateHUD, 15000);
+    setInterval(sync, 15000);
+    sync();
 </script>
 </body>
 </html>
