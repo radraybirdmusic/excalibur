@@ -3,172 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EXCALIBUR // HUD v1.30</title>
+    <title>CRi1 EXCALIBUR v1.4</title>
     <style>
-        :root { --neon-green: #00ff41; --dark-green: #003b00; --warning-amber: #ffb000; --terminal-black: #050505; }
-        * { box-sizing: border-box; }
-        body { background: var(--terminal-black); color: var(--neon-green); font-family: 'Courier New', monospace; margin: 0; padding: 10px; overflow-x: hidden; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--dark-green); padding-bottom: 5px; margin-bottom: 10px; }
-        .node-id { font-size: 0.8em; color: #fff; }
-        .round-badge { border: 1px solid var(--neon-green); padding: 2px 10px; background: var(--dark-green); font-weight: bold; }
+        :root {
+            --bg-black: #000000;
+            --taco-yellow: #FFD200;
+            --fae-purple: #800080;
+            --text-active: #FFFF00; 
+            --node-color: #40E0D0;
+            --hammer-line: #333;
+        }
 
-        /* IMAGE PORT: Optimized for Root 400x400 PNGs */
-        .portrait-frame { width: 100%; height: 220px; border: 1px solid var(--dark-green); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; background: #000; overflow: hidden; position: relative; }
-        #char-portrait { max-width: 95%; max-height: 95%; object-fit: contain; image-rendering: pixelated; }
-        .frame-label { position: absolute; bottom: 5px; right: 5px; font-size: 0.5em; color: var(--dark-green); }
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-black);
+            font-family: 'Courier New', Courier, monospace;
+            color: white;
+            height: 100%;
+            overflow: hidden;
+            user-select: none;
+        }
 
-        /* OBJECTIVES PANEL */
-        .objective-panel { border: 1px solid var(--warning-amber); padding: 10px; margin-bottom: 10px; background: rgba(255, 176, 0, 0.05); }
-        .label { color: var(--warning-amber); font-size: 0.7em; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; display: block; }
-        #objective-list { list-style: square; padding-left: 18px; margin: 5px 0; font-size: 0.85em; color: #fff; }
+        /* TACO BELL HEADER v1.4 */
+        header {
+            background-color: var(--taco-yellow);
+            color: black;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 4px solid #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
 
-        /* MESSAGING AREA */
-        .message-area { border: 1px solid var(--dark-green); padding: 8px; height: 140px; overflow-y: auto; margin-bottom: 8px; font-size: 0.8em; }
-        #inbox-list { list-style: none; padding: 0; margin: 0; }
-        #inbox-list li { border-bottom: 1px solid #111; padding: 5px 0; }
+        .version-stamp { font-size: 10px; opacity: 0.7; }
 
-        /* GRID & CONTROLS */
-        .node-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-bottom: 5px; }
-        .node-btn { aspect-ratio: 1/1; border: 1px solid var(--neon-green); background: transparent; color: var(--neon-green); font-size: 0.6em; }
-        .node-btn.selected { background: var(--neon-green); color: black; font-weight: bold; }
-        textarea { width: 100%; background: #111; color: #fff; border: 1px solid var(--dark-green); padding: 8px; font-size: 16px; margin-bottom: 5px; font-family: monospace; }
-        .action-btn { width: 100%; background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; text-transform: uppercase; }
+        /* FAE MODE SWITCH */
+        .fae-toggle {
+            background: black;
+            color: var(--taco-yellow);
+            border: 2px solid black;
+            padding: 6px 12px;
+            font-size: 14px;
+            text-transform: lowercase;
+            border-radius: 2px;
+            font-weight: 900;
+            transition: 0.1s;
+        }
 
-        /* THE LOG (Pop-up) */
-        .log-trigger { background: #222; color: var(--warning-amber); border: 1px solid var(--warning-amber); padding: 6px; font-size: 0.8em; width: 100%; margin-top: 10px; cursor: pointer; }
-        #log-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 20px; border: 2px solid var(--neon-green); overflow-y: auto; }
-        .close-btn { color: #f44; border: 1px solid #f44; padding: 10px; text-align: center; margin-top: 20px; font-weight: bold; }
+        .fae-active .fae-toggle {
+            background: #fff;
+            color: var(--fae-purple);
+            box-shadow: 0 0 15px var(--fae-purple);
+            border-color: var(--fae-purple);
+        }
+
+        /* VIEWPORT & PERFORMANCE CARDS */
+        #viewport {
+            padding: 20px;
+            height: calc(100% - 260px);
+            overflow-y: auto;
+            border-left: 1px solid var(--hammer-line);
+            border-right: 1px solid var(--hammer-line);
+        }
+
+        .character-header {
+            border-bottom: 2px solid var(--node-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        #display-name {
+            font-size: 24px;
+            color: var(--text-active);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stage-manager {
+            background: rgba(255, 255, 0, 0.05);
+            border: 1px dashed #444;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .label { font-size: 11px; color: #777; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .prompt-box { font-size: 18px; margin-bottom: 20px; color: #fff; line-height: 1.4; }
+        .crazy-box { font-size: 18px; color: var(--text-active); border-top: 1px solid #222; padding-top: 10px; }
+
+        /* THE BRASS (SWITCHBOARD) */
+        #brass {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 190px;
+            background: #0a0a0a;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            padding: 8px;
+            box-sizing: border-box;
+            border-top: 4px solid #222;
+        }
+
+        .node-btn {
+            background: #222;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: inset -3px -3px 0px #000, inset 1px 1px 0px #444;
+            border-radius: 2px;
+        }
+
+        .node-btn.active {
+            background: var(--active-chakra);
+            color: black;
+            box-shadow: inset 2px 2px 0px #000;
+        }
+
+        #entangle-btn {
+            grid-column: span 5;
+            background: #a00;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: 3px;
+            border: 2px solid #f00;
+            margin-top: 4px;
+        }
+
+        /* FAE MODE FLIP */
+        .fae-active { filter: hue-rotate(180deg) brightness(1.1) contrast(1.1); }
+        .fae-active #viewport { background: radial-gradient(circle, #100010 0%, #000 100%); }
     </style>
 </head>
-<body>
+<body id="master-body">
 
 <header>
-    <div class="node-id">SYSTEM: <span id="node-label">--</span></div>
-    <div class="round-badge">RD: <span id="rd-num">--</span></div>
+    <div>
+        <div>EXCALIBUR v1.4</div>
+        <div class="version-stamp">FAE_SWITCHBOARD // STABLE</div>
+    </div>
+    <button class="fae-toggle" onclick="toggleFae()">fae mode</button>
 </header>
 
-<div class="portrait-frame">
-    <img id="char-portrait" src="" alt="[ LOADING_IDENTITY... ]">
-    <div class="frame-label">SCAN_MODE_v1.30</div>
-</div>
-
-<div class="objective-panel">
-    <span class="label">Primary Objectives</span>
-    <ul id="objective-list"><li>Pulsing for mission data...</li></ul>
-</div>
-
-<span class="label">The Ripple // Decrypted Relays</span>
-<div class="message-area">
-    <ul id="inbox-list"></ul>
-</div>
-
-<div class="node-grid" id="grid"></div>
-<textarea id="msg-input" rows="2" placeholder="Input performance cue..."></textarea>
-<button class="action-btn" onclick="shoot()">[ EXECUTE SHOT ]</button>
-
-<button class="log-trigger" onclick="toggleLog()">[ OPEN CHARACTER LOG ]</button>
-
-<div id="log-overlay">
-    <h2>CHARACTER ARCHIVE</h2>
-    <hr style="border:1px solid var(--dark-green)">
-    <div style="margin-top:20px;">
-        <span class="label">Identity Profile</span>
-        <p id="bio-display" style="color:#fff; font-size:0.9em;"></p>
+<div id="viewport">
+    <div class="character-header">
+        <div id="display-name">SELECT NODE</div>
+        <div id="display-bio" style="font-size: 10px; color: #666;">BRASS_READY // 30_NOTE_ACTIVE</div>
     </div>
-    <div style="margin-top:20px;">
-        <span class="label">NPC Intelligence Cache</span>
-        <p id="mail-display" style="color:var(--warning-amber); font-style:italic; font-size:0.9em;"></p>
+    
+    <div class="stage-manager">
+        <span class="label">Primary Performance Goal</span>
+        <div class="prompt-box" id="display-hook">Initiate frequency selection to begin.</div>
+        
+        <span class="label">Crazy Story (Performance Prompt)</span>
+        <div class="prompt-box crazy-box" id="display-story">---</div>
     </div>
-    <div class="close-btn" onclick="toggleLog()">[ RETURN TO HUD ]</div>
+</div>
+
+<div id="brass">
+    <div id="node-grid" style="display: contents;"></div>
+    <div id="entangle-btn" onclick="triggerRobo()">entangle</div>
 </div>
 
 <script>
-    const BIN_ID = "69df3b3e856a682189369836";
-    const API_KEY = "$2a$10$Py08gG/gZ3q3jcSUOXcVruxQ8/PsjObMgTZg7oEJdGkL7ZTh5rFPq";
-    const params = new URLSearchParams(window.location.search);
-    const myNodeID = params.get('node') || "01";
-    let selectedNodes = [];
+    const manifest = {
+        "01": { name: "Marshall", color: "#40E0D0", freq: 261.6, hook: "Tell someone the fire in the forge is cold today.", story: "Tell them the metal turned to runny juice but it didn't even burn you!" },
+        "02": { name: "Seer", color: "#FF0000", freq: 293.7, hook: "Tell someone your ears are ringing like a bell.", story: "Tell them you saw the walls start to wiggle like they were made of Jell-O!" },
+        "03": { name: "Capt. Marsh", color: "#0000FF", freq: 329.6, hook: "Complain that the water tastes like old pennies.", story: "Tell them you saw a fish with three eyes and it tried to say your name!" },
+        "04": { name: "Hammer", color: "#FFFF00", freq: 349.2, hook: "Tell someone the iron feels brittle and soft.", story: "Tell them you hit a nail and it turned into a blue butterfly!" },
+        "05": { name: "Farrier", color: "#800080", freq: 392.0, hook: "Check the bellows and say there's no air in them.", story: "Tell them the fire turned blue and started singing a song!" },
+        "06": { name: "Echo", color: "#008000", freq: 440.0, hook: "Ask someone if they just heard a voice behind them.", story: "Tell them you saw the news of tomorrow written in a rain puddle!" },
+        "07": { name: "Surgeon", color: "#FF4500", freq: 493.9, hook: "Tell someone their heartbeat sounds like a ticking clock.", story: "Tell them you saw a man's shadow get up and walk away without him!" },
+        "08": { name: "Librarian", color: "#AFEEEE", freq: 523.3, hook: "Say the books are whispering while they're closed.", story: "Tell them the ink ran off the page and crawled away like a bug!" },
+        "09": { name: "Surveyor", color: "#FFD700", freq: 587.3, hook: "Tell someone the creek is moving the wrong way.", story: "Tell them the map changed its own lines while you were looking!" },
+        "10": { name: "Gambler", color: "#9932CC", freq: 659.3, hook: "Say the dice feel squishy like big grapes.", story: "Tell them you saw a deck of cards where the faces were crying tears!" },
+        "11": { name: "Telegraphist", color: "#32CD32", freq: 698.5, hook: "Say someone is knocking from inside the table.", story: "Tell them the machine is spitting out salt water instead of paper!" },
+        "12": { name: "Outlaw", color: "#FFC0CB", freq: 784.0, hook: "Ask if they can see the 'static' in the air.", story: "Tell them you found gold that turns into dust if you blink!" },
+        "13": { name: "Drifter", color: "#00CED1", freq: 880.0, hook: "Tell someone you've been in this room before.", story: "Tell them you walked for an hour but stayed in the same spot!" },
+        "14": { name: "Proprietor", color: "#6A5ACD", freq: 932.3, hook: "Say the money in the box feels cold as ice.", story: "Tell them a customer paid with a coin that had your baby-face on it!" },
+        "15": { name: "Resident", color: "#FFD700", freq: 987.8, hook: "Tell someone you are guarding a secret book.", story: "Tell them the book opened itself and started talking to you!" }
+    };
 
-    const g = document.getElementById('grid');
-    for (let i = 1; i <= 15; i++) {
-        let id = i.toString().padStart(2, '0');
-        if (id === myNodeID) continue;
-        let b = document.createElement('button');
-        b.className = 'node-btn'; b.id = `btn-${id}`; b.innerText = id;
-        b.onclick = () => {
-            if (selectedNodes.includes(id)) {
-                selectedNodes = selectedNodes.filter(n => n !== id);
-                b.classList.remove('selected');
-            } else {
-                selectedNodes.push(id);
-                b.classList.add('selected');
-            }
-        };
-        g.appendChild(b);
+    let audioCtx = null;
+    let isFae = false;
+
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+    function toggleFae() {
+        initAudio();
+        isFae = !isFae;
+        document.getElementById('master-body').classList.toggle('fae-active');
+        playTone(150, 'square', 0.1); 
+        if (navigator.vibrate) navigator.vibrate(40);
     }
 
-    function toggleLog() {
-        const log = document.getElementById('log-overlay');
-        log.style.display = log.style.display === 'block' ? 'none' : 'block';
+    function playTone(freq, type = 'sine', duration = 0.3) {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        let targetFreq = isFae ? freq * 0.707 : freq; // Fae Mode frequency shift
+        osc.type = isFae ? 'sawtooth' : type;
+        
+        osc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
     }
 
-    async function sync() {
-        try {
-            const resBin = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?nocache=${Date.now()}`, { headers: { "X-Master-Key": API_KEY } });
-            const binData = await resBin.json();
-            const rd = binData.record.config?.round || 1;
-            document.getElementById('rd-num').innerText = rd;
+    function selectNode(id) {
+        initAudio();
+        const node = manifest[id];
+        
+        document.getElementById('display-name').innerText = (id === "03") ? '"OLD BED" MARSH' : node.name;
+        document.getElementById('display-hook').innerText = node.hook;
+        document.getElementById('display-story').innerText = node.story;
+        document.documentElement.style.setProperty('--node-color', node.color);
 
-            const resMan = await fetch(`./manifest.json?t=${Date.now()}`);
-            const manData = await resMan.json();
-            const myInfo = manData.assignments[myNodeID][0];
-            const roundData = manData.round_schedule[rd][myInfo]["scenario_A"];
+        playTone(node.freq);
+        if (navigator.vibrate) navigator.vibrate(25);
 
-            document.getElementById('node-label').innerText = myInfo.replace('NODE_', '');
-            document.getElementById('bio-display').innerText = manData.library[myInfo].bio;
-            document.getElementById('mail-display').innerText = roundData.mail;
-            
-            // --- ROOT IMAGE LOGIC v1.30 ---
-            const portrait = document.getElementById('char-portrait');
-            // Adding cache-busting timestamp to force image refresh
-            const imgFile = `./node_${myNodeID}.png?v=${Date.now()}`;
-            portrait.src = imgFile;
-
-            let objHtml = "";
-            roundData.motives.forEach(m => objHtml += `<li>${m}</li>`);
-            document.getElementById('objective-list').innerHTML = objHtml;
-
-            let inHtml = "";
-            [...binData.record.messages].reverse().forEach(p => {
-                if (p.to.split(',').includes(myNodeID)) inHtml += `<li><span style="color:var(--warning-amber)">[F_${p.from}]</span> ${p.msg}</li>`;
-                else if (p.from === myNodeID) inHtml += `<li style="color:#666">[S_${p.to}] ${p.msg}</li>`;
-            });
-            document.getElementById('inbox-list').innerHTML = inHtml || "<li>Signal Dead.</li>";
-        } catch(e) { console.error("SYNC_ERROR", e); }
+        document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${id}`).classList.add('active');
     }
 
-    async function shoot() {
-        const msg = document.getElementById('msg-input').value;
-        if (!selectedNodes.length || !msg) return;
-        try {
-            const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } });
-            const d = await resGet.json();
-            let ml = d.record.messages || [];
-            ml.push({ from: myNodeID, to: selectedNodes.join(','), msg: msg });
-            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT', headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-                body: JSON.stringify({ ...d.record, messages: ml.slice(-40) })
-            });
-            document.getElementById('msg-input').value = "";
-            selectedNodes = [];
-            document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('selected'));
-            sync();
-        } catch(e) { alert("SHOT_FAILED"); }
+    function triggerRobo() {
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        playTone(80, 'square', 0.6);
+        alert("entangle: SIGNAL OVERRIDE\nTarget has been engaged.");
     }
 
-    setInterval(sync, 15000);
-    sync();
+    const grid = document.getElementById('node-grid');
+    Object.keys(manifest).forEach(id => {
+        const btn = document.createElement('div');
+        btn.className = 'node-btn';
+        btn.id = `btn-${id}`;
+        btn.style.setProperty('--active-chakra', manifest[id].color);
+        btn.innerHTML = `<span style="font-size:10px; margin-bottom:5px;">${id}</span><div style="width:14px; height:14px; background:${manifest[id].color}; border-radius:2px; box-shadow: 0 0 5px ${manifest[id].color};"></div>`;
+        btn.onclick = () => selectNode(id);
+        grid.appendChild(btn);
+    });
 </script>
+
 </body>
 </html>
