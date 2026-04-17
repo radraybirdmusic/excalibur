@@ -3,109 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CRi1 EXCALIBUR v1.5.2 // AGENCY_LOCK</title>
+    <title>EXCALIBUR v1.6 // SATURDAY_GOLD</title>
     <style>
-        :root { --bg: #000; --taco: #FFD200; --active: #FFFF00; --node: #40E0D0; }
-        body, html { margin: 0; background: var(--bg); font-family: 'Courier New', monospace; color: #fff; height: 100%; overflow: hidden; }
-        header { background: var(--taco); color: #000; padding: 10px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #444; }
-        #viewport { padding: 15px; height: calc(100% - 290px); overflow-y: auto; }
-        .character-name { font-size: 24px; color: var(--active); text-transform: uppercase; margin-bottom: 2px; }
-        .metadata { font-size: 10px; color: #666; display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 12px; }
-        .stage-box { background: rgba(255, 210, 0, 0.05); border-left: 4px solid var(--node); padding: 12px; line-height: 1.4; }
-        .label-tag { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 4px; }
-        #brass { position: fixed; bottom: 0; width: 100%; height: 210px; background: #080808; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 10px; box-sizing: border-box; border-top: 4px solid #222; }
-        .node-btn { background: #151515; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset -2px -2px 0px #000, inset 1px 1px 0px #333; }
-        .node-btn.active { background: var(--node); color: #000; box-shadow: inset 2px 2px 0px #000; }
-        #entangle { grid-column: span 5; background: #900; color: #fff; text-align: center; padding: 12px; font-weight: 900; border: 2px solid #f00; margin-top: 5px; }
-        #flash { position: fixed; top: 0; width: 100%; height: 100%; background: #fff; display: none; z-index: 1000; opacity: 0.5; }
-        .fae { filter: hue-rotate(180deg) invert(100%); }
+        :root {
+            --taco: #FFD200;
+            --neon: #39FF14; /* Glitch Green */
+            --bg: #000;
+            --active-node: #40E0D0;
+        }
+        body, html { 
+            margin: 0; padding: 0; background: var(--bg); 
+            font-family: 'Courier New', monospace; color: #fff; 
+            height: 100vh; overflow: hidden; 
+        }
+
+        /* TACO BELL HEADER */
+        header {
+            background: var(--taco); color: #000; padding: 12px;
+            font-weight: 900; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid #444;
+        }
+
+        /* NAVIGATION PADS (The Rad App Style) */
+        nav {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            background: #111; border-bottom: 2px solid #333;
+        }
+        .nav-btn {
+            padding: 15px 0; text-align: center; font-size: 24px;
+            cursor: pointer; border-right: 1px solid #222;
+            transition: 0.1s;
+        }
+        .nav-btn.active { background: var(--taco); filter: grayscale(1) invert(1); }
+
+        /* VIEWPORT PAGES */
+        .page { display: none; height: calc(100vh - 350px); overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .page.active { display: block; }
+
+        /* HUD ELEMENTS */
+        .node-title { color: var(--taco); font-size: 26px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+        .prompt-card { background: #080808; border-left: 4px solid var(--active-node); padding: 15px; margin-top: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .label { font-size: 10px; color: #666; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .text { font-size: 18px; margin-bottom: 20px; line-height: 1.4; }
+
+        /* THE BRASS (SWITCHBOARD) */
+        #brass {
+            position: fixed; bottom: 0; width: 100%; height: 210px;
+            background: #050505; display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 4px; padding: 10px; box-sizing: border-box; border-top: 4px solid #333;
+        }
+        .node-btn {
+            background: #151515; border: none; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: #444; border-radius: 2px;
+            box-shadow: inset -2px -2px 0px #000, inset 1px 1px 0px #333;
+        }
+        .node-btn.active { background: var(--active-node); color: #000; box-shadow: inset 2px 2px 0px #000; }
+        .btn-id { font-size: 10px; font-weight: bold; }
+
+        #entangle {
+            grid-column: span 5; background: #900; color: #fff;
+            text-align: center; padding: 12px; font-weight: 900;
+            text-transform: uppercase; border: 2px solid #f00; margin-top: 5px;
+            letter-spacing: 2px;
+        }
+
+        /* UTILITY */
+        .fae-active { filter: hue-rotate(90deg) invert(100%); }
+        #flash { position: fixed; top: 0; width: 100%; height: 100%; background: var(--neon); display: none; z-index: 1000; opacity: 0.5; }
     </style>
 </head>
-<body id="main">
+<body id="app-body">
     <div id="flash"></div>
     <header>
-        <div>EXCALIBUR v1.5.2</div>
-        <div style="font-size: 10px; font-family: serif;">[p#.##] : // : \\ ; @ !</div>
-        <button onclick="toggleFae()" style="background:#000; color:var(--taco); border:1px solid #000; font-size:10px; padding:4px 8px;">FAE</button>
+        <div>EXCALIBUR v1.6</div>
+        <div style="font-size: 10px; font-family: serif;">[p#.##] : // : \\</div>
     </header>
 
-    <div id="viewport">
-        <div id="node-name" class="character-name">SYNC_STANDBY</div>
-        <div class="metadata">
-            <div id="node-hex">HEX: ----</div>
-            <div id="node-freq">FREQ: ----</div>
-            <div id="node-phase" style="grid-column: span 2;">PHASE: NO_SIGNAL</div>
+    <nav>
+        <div class="nav-btn active" onclick="showPage('perf', this)">🎭</div> <div class="nav-btn" onclick="showPage('admin', this)">⚙️</div> <div class="nav-btn" onclick="showPage('ledger', this)">📜</div> <div class="nav-btn" onclick="toggleFae()">🌀</div> </nav>
+
+    <div id="perf" class="page active">
+        <div id="node-name" class="node-title">SYNC_REQUIRED</div>
+        <div class="prompt-card">
+            <span class="label">Primary Goal</span>
+            <div id="node-hook" class="text">Select node from the Brass.</div>
+            <span class="label">Crazy Story Prompt</span>
+            <div id="node-story" class="text" style="color:var(--neon)">---</div>
         </div>
-        <div class="stage-box">
-            <div class="label-tag">Performance Goal</div>
-            <div id="node-hook" style="margin-bottom: 15px;">Engage the Brass Switchboard.</div>
-            <div class="label-tag">Crazy Story (8yr Simple)</div>
-            <div id="node-story" style="color:var(--active);">---</div>
+    </div>
+
+    <div id="admin" class="page">
+        <div class="node-title">NODAL_DNA</div>
+        <div id="spec-data" style="font-size: 14px; line-height: 2; color: #aaa;">
+            [WAITING FOR PACKET...]
+        </div>
+    </div>
+
+    <div id="ledger" class="page">
+        <div class="node-title">RELAY_HISTORY</div>
+        <div id="history-log" style="font-size: 14px; color: #555;">
+            LEDGER_CLEAR // NO_INTERCEPTS
         </div>
     </div>
 
     <div id="brass">
         <div id="grid" style="display: contents;"></div>
-        <button id="entangle" onclick="entangle()">ENTANGLE_RELAY</button>
+        <div id="entangle" onclick="entangle()">entangle_relay</div>
     </div>
 
 <script>
-    const data = [
-        {id:"01", n:"Marshall", c:"#40E0D0", f:261.6, p:"C-FUNDAMENTAL (STATIC)", h:"Fire is cold.", s:"Metal turned to juice!"},
-        {id:"02", n:"Seer", c:"#FF0000", f:293.7, p:"16Hz RIPPLE // VESSEL", h:"Ears ringing.", s:"Walls are wiggling!"},
-        {id:"03", n:"Old Bed", c:"#0000FF", f:329.6, p:"DEEP ATLANTIC // ANCHOR", h:"Water tastes like pennies.", s:"Three-eyed fish spoke!"},
-        {id:"04", n:"Hammer", c:"#FFFF00", f:349.2, p:"CDE // MINOR THIRD", h:"Iron is brittle.", s:"Nail is a butterfly!"},
-        {id:"05", n:"Farrier", c:"#800080", f:392.0, p:"CDE // PERFECT FIFTH", h:"Bellows empty.", s:"Blue fire singing!"},
-        {id:"06", n:"Echo", c:"#008000", f:440.0, p:"VOICE // PERSISTENT", h:"Hear the voice?", s:"News in the rain!"},
-        {id:"07", n:"Surgeon", c:"#FF4500", f:493.9, p:"INHALE C / EXHALE A#", h:"Heartbeat clock.", s:"Shadow ran away!"},
-        {id:"08", n:"Librarian", c:"#AFEEEE", f:523.3, p:"JUST UNISON (1:1)", h:"Books whispering.", s:"Words fell off!"},
-        {id:"09", n:"Surveyor", c:"#FFD700", f:587.3, p:"GRAVITY SLIDE (B>A)", h:"Creek is moving.", s:"Map changed itself!"},
-        {id:"10", n:"Gambler", c:"#9932CC", f:659.3, p:"9:8 MAJOR SECOND", h:"Squishy dice.", s:"Crying cards!"},
-        {id:"11", n:"Telegraphist", c:"#32CD32", f:698.5, p:"SIGNAL OVERRIDE", h:"Table knocking.", s:"Salt water machine!"},
-        {id:"12", n:"Outlaw", c:"#FFC0CB", f:784.0, p:"AURORA ROSE // STATIC", h:"Static in air?", s:"Dusty gold!"},
-        {id:"13", n:"Drifter", c:"#00CED1", f:880.0, p:"TIME_LOOP // PHASE", h:"Been here before.", s:"Walking in place!"},
-        {id:"14", n:"Proprietor", c:"#6A5ACD", f:932.3, p:"FINITE FLARE", h:"Cold coins.", s:"Baby-face coin!"},
-        {id:"15", n:"Resident", c:"#FFD700", f:987.8, p:"5:4 MAJOR THIRD", h:"Secret book.", s:"Book spoke to me!"}
+    const manifest = [
+        {id:"01", n:"Marshall", c:"#40E0D0", f:261.6, h:"Fire is cold.", s:"Metal turned to juice!"},
+        {id:"02", n:"Seer", c:"#FF0000", f:293.7, h:"Ears ringing.", s:"Walls are wiggling!"},
+        {id:"03", n:"Old Bed", c:"#0000FF", f:329.6, h:"Water tastes like pennies.", s:"Three-eyed fish spoke!"},
+        {id:"04", n:"Hammer", c:"#FFFF00", f:349.2, h:"Iron is brittle.", s:"Nail is a butterfly!"},
+        {id:"05", n:"Farrier", c:"#800080", f:392.0, h:"Bellows empty.", s:"Blue fire singing!"},
+        {id:"06", n:"Echo", c:"#008000", f:440.0, h:"Hear the voice?", s:"News in rain puddle!"},
+        {id:"07", n:"Surgeon", c:"#FF4500", f:493.9, h:"Heartbeat clock.", s:"Shadow ran away!"},
+        {id:"08", n:"Librarian", c:"#AFEEEE", f:523.3, h:"Books whispering.", s:"Words fell off page!"},
+        {id:"09", n:"Surveyor", c:"#FFD700", f:587.3, h:"Creek is moving.", s:"Map changed itself!"},
+        {id:"10", n:"Gambler", c:"#9932CC", f:659.3, h:"Squishy dice.", s:"Crying cards!"},
+        {id:"11", n:"Telegraphist", c:"#32CD32", f:698.5, h:"Knocking in table.", s:"Salt water machine!"},
+        {id:"12", n:"Outlaw", c:"#FFC0CB", f:784.0, h:"Static in air?", s:"Dusty gold!"},
+        {id:"13", n:"Drifter", c:"#00CED1", f:880.0, h:"Been here before.", s:"Walking in place!"},
+        {id:"14", n:"Proprietor", c:"#6A5ACD", f:932.3, h:"Cold coins.", s:"Baby-face coin!"},
+        {id:"15", n:"Resident", c:"#FFD700", f:987.8, h:"Secret book.", s:"Book spoke to me!"}
     ];
 
-    let audio = null; let fae = false;
-    function init() { if(!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); }
-    function toggleFae() { fae=!fae; document.getElementById('main').classList.toggle('fae'); }
+    let audio = null;
+
+    function showPage(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function initAudio() { if(!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); }
 
     function select(n) {
-        init();
+        initAudio();
         document.getElementById('node-name').innerText = n.n;
         document.getElementById('node-hook').innerText = n.h;
         document.getElementById('node-story').innerText = n.s;
-        document.getElementById('node-hex').innerText = "HEX: " + n.c;
-        document.getElementById('node-freq').innerText = "FREQ: " + n.f + "Hz";
-        document.getElementById('node-phase').innerText = "PHASE: " + n.p;
-        document.documentElement.style.setProperty('--node', n.c);
+        document.getElementById('spec-data').innerHTML = `NODE: ${n.id}<br>HEX: ${n.c}<br>FREQ: ${n.f}Hz<br>STATUS: ENCRYPTED`;
+        document.documentElement.style.setProperty('--active-node', n.c);
         
-        const osc = audio.createOscillator(); const g = audio.createGain();
-        osc.type = fae ? 'sawtooth' : 'sine';
-        osc.frequency.setValueAtTime(fae ? n.f * 0.707 : n.f, audio.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.5);
+        const osc = audio.createOscillator();
+        const g = audio.createGain();
+        osc.frequency.setValueAtTime(n.f, audio.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.3);
         osc.connect(g); g.connect(audio.destination);
-        osc.start(); osc.stop(audio.currentTime + 0.5);
-        
-        document.querySelectorAll('.node-btn').forEach(b=>b.classList.remove('active'));
-        document.getElementById('btn-'+n.id).classList.add('active');
+        osc.start(); osc.stop(audio.currentTime + 0.3);
+
+        document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + n.id).classList.add('active');
     }
+
+    function toggleFae() { document.body.classList.toggle('fae-active'); }
 
     function entangle() {
         const f = document.getElementById('flash'); f.style.display='block';
-        setTimeout(()=>f.style.display='none',150);
-        if(navigator.vibrate) navigator.vibrate([100,50,100]);
+        setTimeout(()=> f.style.display='none', 100);
+        if(navigator.vibrate) navigator.vibrate([50, 30, 50]);
     }
 
-    const shuffled = data.sort(() => Math.random() - 0.5);
-    const container = document.getElementById('grid');
+    const shuffled = [...manifest].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById('grid');
     shuffled.forEach(n => {
-        const b = document.createElement('div'); b.className='node-btn'; b.id='btn-'+n.id;
-        b.innerHTML = `<span style="font-size:10px;">${n.id}</span><div style="width:12px;height:12px;background:${n.c};border-radius:2px;"></div>`;
+        const b = document.createElement('div');
+        b.className = 'node-btn'; b.id = 'btn-' + n.id;
+        b.innerHTML = `<span class="btn-id">${n.id}</span><div style="width:14px;height:14px;background:${n.c};border-radius:2px;"></div>`;
         b.onclick = () => select(n);
-        container.appendChild(b);
+        grid.appendChild(b);
     });
 </script>
 </body>
